@@ -1,0 +1,10 @@
+# We store all text files in LF format.
+* text=auto eol=lf
+
+# For popular extensions
+*.js   text eol=lf
+*.ts   text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
