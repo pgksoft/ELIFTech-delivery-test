@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "rootDir": ".",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@api/*": [
+        "src/app-infrastructure/api/*"
+      ],
+      "@helpers/*": [
+        "src/app-infrastructure/app-helpers/*"
+      ],
+      "@middleware/*": [
+        "src/app-infrastructure/app-middleware/*"
+      ],
+      "@logger/*": [
+        "src/app-infrastructure/logger/*"
+      ],
+      "@app-types/*": [
+        "src/app-infrastructure/app-type-helpers/*"
+      ],
+      "@infra/*": [
+        "src/app-infrastructure/*"
+      ],
+      "@db/*": [
+        "src/db/*"
+      ],
+      "@domain/*": [
+        "src/domain/*"
+      ],
+      "@src/*": [
+        "src/*"
+      ],
+      "@env/*": [
+        "settings-core/env/*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "settings-core",
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
