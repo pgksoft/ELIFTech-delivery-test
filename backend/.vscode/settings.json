@@ -1,0 +1,10 @@
+{
+    // Уменьшают «шум» в подсказках
+    // "js/ts.suggest.autoImports": false,
+    "editor.suggest.showWords": false,
+    "editor.suggest.showSnippets": false,
+    "editor.suggest.showKeywords": false,
+    "editor.suggest.showFunctions": true,
+    "editor.suggest.showVariables": true,
+    "js/ts.tsdk.path": "node_modules\\typescript\\lib"
+}

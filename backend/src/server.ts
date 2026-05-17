@@ -4,6 +4,7 @@ import APP_TITLE from '@infra/const/app-title';
 import { createApp } from '@infra/create-app';
 import { logger } from '@logger/index';
 import { setupProcessHandlers } from '@helpers/setup-process-handlers';
+import { apiPublicUrl } from '@api/const/api-url';
 
 setupProcessHandlers();
 
@@ -12,9 +13,9 @@ const main = async () => {
   const app = createApp();
   app.listen(config.port, () => {
     logger.info(`${APP_TITLE.launchServer} ${APP_TITLE.localUrl}:${config.port}`);
-    //   logger.info(
-    //     `${APP_TITLE.aboutDocs} ${APP_TITLE.localUrl}:${config.port}${apiUnAuthUrl.apiDocsV1}`,
-    //   );
+    logger.info(
+      `${APP_TITLE.aboutDocs} ${APP_TITLE.localUrl}:${config.port}${apiPublicUrl.openApiDocs}`,
+    );
   });
 };
 

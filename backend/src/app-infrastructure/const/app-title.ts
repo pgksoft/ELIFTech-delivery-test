@@ -1,5 +1,6 @@
-const APP_TITLE: Record<string, string> = {
-  name: `ExpressJS server: Eliftech's test project: full stack web application - users can order food delivery`,
+const APP_TITLE = {
+  name: `Eliftech's test project: full stack web application - users can order food delivery`,
+  serverName: `ExpressJS server`,
   hi: 'Hi',
   launchServer: '🚀 ExpressJS server is launching on',
   aboutDocs: 'Swagger docs available at',
