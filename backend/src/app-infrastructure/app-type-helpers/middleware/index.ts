@@ -6,6 +6,6 @@ export type TAsyncAppMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction,
-) => Promise<void>;
+) => Promise<Response<any, Record<string, any>> | undefined>;
 
 export type TAppHandler = TAppMiddleware | TAsyncAppMiddleware;

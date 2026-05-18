@@ -1,44 +1,47 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "node16",
     "rootDir": ".",
     "outDir": "dist",
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "moduleResolution": "node16",
     "paths": {
       "@api/*": [
-        "src/app-infrastructure/api/*"
+        "./src/app-infrastructure/api/*"
       ],
       "@helpers/*": [
-        "src/app-infrastructure/app-helpers/*"
+        "./src/app-infrastructure/app-helpers/*"
       ],
       "@middleware/*": [
-        "src/app-infrastructure/app-middleware/*"
+        "./src/app-infrastructure/app-middleware/*"
       ],
       "@logger/*": [
-        "src/app-infrastructure/logger/*"
+        "./src/app-infrastructure/logger/*"
       ],
       "@app-types/*": [
-        "src/app-infrastructure/app-type-helpers/*"
+        "./src/app-infrastructure/app-type-helpers/*"
+      ],
+      "@serialization/*": [
+        "./src/app-infrastructure/serialization/*"
       ],
       "@infra/*": [
-        "src/app-infrastructure/*"
+        "./src/app-infrastructure/*"
       ],
       "@db/*": [
-        "src/db/*"
+        "./src/db/*"
       ],
       "@domain/*": [
-        "src/domain/*"
+        "./src/domain/*"
       ],
       "@src/*": [
-        "src/*"
+        "./src/*"
       ],
       "@env/*": [
-        "settings-core/env/*"
+        "./settings-core/env/*"
       ]
     }
   },

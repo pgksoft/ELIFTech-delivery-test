@@ -1,7 +1,7 @@
 import '@app-types/express';
 import { logger } from '@logger/index';
 import { v4 as uuid } from 'uuid';
-import { getLogLevel } from '@middleware/helpers/get-log-level';
+import { getLogLevel } from '@helpers/get-log-level';
 import type { TAppMiddleware } from '@infra/app-type-helpers/middleware';
 import { COOKIE_NAME } from '@middleware/ensure-guest-id';
 

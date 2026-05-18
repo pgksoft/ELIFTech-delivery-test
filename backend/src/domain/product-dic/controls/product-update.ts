@@ -1,0 +1,38 @@
+import type TEntityMutationResult from '@app-types/entity/t-entity-mutation-result';
+import type { TApiProduct, TProductMutationDto, TProductPopulated, TProductSchema } from '../model';
+import { ProductModel } from '../model';
+import { updatePopulateAndSerialize } from '@db/populate-&-serialize';
+import {
+  productPopulateConfig,
+  productSerializationRules,
+} from '../const/serialization&populate-config';
+import {
+  getCrudResultError,
+  getCrudResultSuccessJson,
+} from '@helpers/send-mutation-result/crud-result';
+import { analyzeMongoError } from '@db/analyze-mongo-error';
+import type { ClientSession } from 'mongoose';
+import { ensureCategoryExists } from '../guards';
+
+export const productUpdate = async (
+  id: string,
+  productMutationDto: TProductMutationDto,
+  session: ClientSession,
+): Promise<TEntityMutationResult<TApiProduct>> => {
+  try {
+    await ensureCategoryExists(productMutationDto.category, session);
+
+    const apiProduct = await updatePopulateAndSerialize<
+      TProductPopulated,
+      typeof productSerializationRules,
+      TApiProduct,
+      TProductSchema
+    >(ProductModel, id, productMutationDto, productSerializationRules, productPopulateConfig);
+
+    if (!apiProduct) return getCrudResultError(464);
+    return getCrudResultSuccessJson(apiProduct, 200);
+  } catch (e) {
+    await session.abortTransaction();
+    return analyzeMongoError(e);
+  }
+};

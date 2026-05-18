@@ -19,6 +19,7 @@ export const config = {
   mongoUri: getEnvVar('MONGO_URI'),
   dbName: getEnvVar('DB_NAME'),
   nodeEnv: process.env.NODE_ENV || 'development',
+  multerDestination: getEnvVar('MULTER_DESTINATION'),
   logLevel: process.env.LOG_LEVEL || (process.env.NODE_ENV === 'development' ? 'debug' : 'info'),
   enablePretty: getBool('ENABLE_PRETTY', process.env.NODE_ENV === 'development'),
   redactedKeys: (process.env.REDACED_KEYS || '')
