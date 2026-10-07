@@ -6,13 +6,16 @@
   "author": "PgkSoft",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^2.2.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "mongoose": "^9.4.1",
+    "mongoose": "^9.9.3",
     "multer": "^2.1.1",
     "pino": "^10.3.1",
+    "qs": "^6.15.3",
+    "query-to-mongo": "^0.12.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "8"
@@ -22,6 +25,8 @@
     "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/server.ts",
     "build": "tsc -p tsconfig.json && tsc-alias",
     "start": "cross-env NODE_ENV=production node dist/src/server.js",
+    "start:trace": "cross-env NODE_ENV=production NODE_OPTIONS='--trace-deprecation' node dist/src/server.js",
+    "dev:trace": "cross-env NODE_ENV=development NODE_OPTIONS='--trace-deprecation' ts-node-dev --respawn --transpile-only --require tsconfig-paths/register src/server.ts",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,md}\""

@@ -14,9 +14,11 @@ import {
 } from '../const/serialization&populate-config';
 import { getCrudResultSuccessJson } from '@helpers/send-mutation-result/crud-result';
 import { analyzeMongoError } from '@db/analyze-mongo-error';
+import type TSortRecord from '@app-types/mongo-type/t-sort-record';
 
 export const productCategoryList = async (
-  filter: TUnknownRecord,
+  rawFilter: TUnknownRecord,
+  rawSort: TSortRecord,
 ): Promise<TEntityMutationResult<TApiProductCategoryDic>> => {
   try {
     const apiProductCategoryDic = await listPopulateAndSerialize<
@@ -26,7 +28,8 @@ export const productCategoryList = async (
       TProductCategorySchema
     >(
       ProductCategoryModel,
-      filter,
+      rawFilter,
+      rawSort,
       productCategorySerializationRules,
       productCategoryPopulateConfig,
     );

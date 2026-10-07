@@ -5,12 +5,14 @@ import type TypeGuard from '@app-types/type-guard';
 import { collectionNames } from '@db/const/collection-names';
 import { applyMutationDateTrigger } from '@db/triggers/mutation-date';
 import { model, Schema } from 'mongoose';
+import definitionProductCategoryDeleteConstraints from '../constraints/delete';
+import { isOneOfStringPredicate } from '@helpers/is-one-of-string-predicate';
 
 export type TProductCategory = { name: String; mutationDate: Date } & TEntityMongoDbMember;
 
 export type TProductCategoryPopulated = TProductCategory;
 
-export type TApiProductCategory = Omit<TProductCategoryPopulated, 'mutationDate'> & {
+export type TApiProductCategory = Omit<TProductCategoryPopulated, 'mutationDate' | '__v'> & {
   mutationDate: String;
 };
 
@@ -27,7 +29,7 @@ export const productCategoryFieldsSchema: TFieldsSchema<TProductCategorySchema> 
     type: String,
     required: true,
     unique: true,
-    minLength: 5,
+    minLength: 3,
     maxLength: 160,
     openApi: { description: 'Product category name' },
   },
@@ -43,7 +45,10 @@ export const productCategoryFieldsSchema: TFieldsSchema<TProductCategorySchema> 
   },
 };
 
-const productCategorySchema = new Schema<TProductCategorySchema>(productCategoryFieldsSchema);
+export const productCategorySchema = new Schema<TProductCategorySchema>(
+  productCategoryFieldsSchema,
+);
+definitionProductCategoryDeleteConstraints();
 applyMutationDateTrigger(productCategorySchema, { field: 'mutationDate' });
 
 export const ProductCategoryModel = model<TProductCategorySchema>(
@@ -51,6 +56,17 @@ export const ProductCategoryModel = model<TProductCategorySchema>(
   productCategorySchema,
   collectionNames.productCategoryDic,
 );
+
+// Allow filter keys
+export type TFilterProductCategoryKey = keyof Pick<TApiProductCategory, 'name' | 'mutationDate'>;
+export const allowFilterProductCategoryKeys: TFilterProductCategoryKey[] = [
+  'name',
+  'mutationDate',
+] as const;
+
+// Allow sort keys
+export type TSortProductCategoryKey = keyof Pick<TApiProductCategory, 'name'>;
+export const allowSortProductCategoryKeys: TSortProductCategoryKey[] = ['name'] as const;
 
 // helpers
 export const isProductCategoryMutationDto: TypeGuard<TProductCategoryMutationDto> = (
@@ -63,3 +79,7 @@ export const isProductCategoryMutationDto: TypeGuard<TProductCategoryMutationDto
     typeof (value as TEntityRecord).name === 'string'
   );
 };
+
+export const isFilterProductCategoryKey = isOneOfStringPredicate(allowFilterProductCategoryKeys);
+
+export const isSortProductCategoryKey = isOneOfStringPredicate(allowSortProductCategoryKeys);

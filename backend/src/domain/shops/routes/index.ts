@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import { shopList } from '../controls/shop-list';
 import sendMutationResult from '@helpers/send-mutation-result';
-import { isShopMutationDto } from '../model';
+import { isFilterShopKey, isShopMutationDto, isSortShopKey } from '../model';
 import { getCrudResultError } from '@helpers/send-mutation-result/crud-result';
 import { shopCreate } from '../controls/shop-create';
 import { MONGODB_TITLE } from '@db/const/mongodb_title';
 import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
 import { shopUpdate } from '../controls/shop-update';
+import checkingAllowKeysEntityFilter from '@middleware/checking-allow-keys-entity-filter';
+import { shopRemove } from '../controls/shop-remove';
 
 const router = Router();
 
@@ -27,8 +29,8 @@ export default router;
  *             schema:
  *               $ref: '#/components/schemas/ShopList'
  */
-router.get('/', async (req, res) => {
-  const result = await shopList({});
+router.get('/', checkingAllowKeysEntityFilter(isFilterShopKey, isSortShopKey), async (req, res) => {
+  const result = await shopList(req.queryFilter, req.querySort);
   sendMutationResult(result, res);
 });
 
@@ -107,5 +109,35 @@ router.put('/:id', async (req, res) => {
     return sendMutationResult(getCrudResultError(400), res);
   }
   const result = await shopUpdate(id, shopMutationDto);
+  return sendMutationResult(result, res);
+});
+
+/**
+ * @openapi
+ * /api/shops/{id}:
+ *   delete:
+ *     tags: [Shops]
+ *     summary: Delete an existing shop name
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     security: []
+ *     responses:
+ *       204:
+ *         description: Existing shop successfully deleted
+ *       400:
+ *         description: Invalid ID
+ *       404:
+ *         description: Shop not found
+ */
+router.delete('/:id', async (req, res) => {
+  const id = req.params.id;
+  if (!isStrictValidObjectId(id)) {
+    return sendMutationResult(getCrudResultError(400, MONGODB_TITLE.invalidId), res);
+  }
+  const result = await shopRemove(id);
   return sendMutationResult(result, res);
 });

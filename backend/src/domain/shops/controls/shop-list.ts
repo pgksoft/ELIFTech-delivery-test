@@ -6,9 +6,11 @@ import { analyzeMongoError } from '@db/analyze-mongo-error';
 import { getCrudResultSuccessJson } from '@helpers/send-mutation-result/crud-result';
 import { shopPopulateConfig, shopSerializationRules } from '../const/serialization&populate-config';
 import { listPopulateAndSerialize } from '@db/populate-&-serialize';
+import type TSortRecord from '@app-types/mongo-type/t-sort-record';
 
 export const shopList = async (
-  filter: TUnknownRecord,
+  rawFilter: TUnknownRecord,
+  rawSort: TSortRecord,
 ): Promise<TEntityMutationResult<TApiShops>> => {
   try {
     const apiShops = await listPopulateAndSerialize<
@@ -16,7 +18,7 @@ export const shopList = async (
       typeof shopSerializationRules,
       TApiShop,
       TShopSchema
-    >(ShopModel, filter, shopSerializationRules, shopPopulateConfig);
+    >(ShopModel, rawFilter, rawSort, shopSerializationRules, shopPopulateConfig);
     return getCrudResultSuccessJson(apiShops);
   } catch (e) {
     return analyzeMongoError(e);

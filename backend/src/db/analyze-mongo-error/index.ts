@@ -17,7 +17,7 @@ enum MongoErrorCode {
 
 export const analyzeMongoError = (e: unknown): TEntityMutationError => {
   if (e instanceof MongoServerError) {
-    logger.debug({ e }, 'analyzeMongoError - MongoServerError');
+    logger.debug(e, 'analyzeMongoError - MongoServerError');
     switch (e.code) {
       case MongoErrorCode.DuplicateKey:
         return getCrudResultError(409, MONGODB_TITLE.duplicateKey);
@@ -35,15 +35,15 @@ export const analyzeMongoError = (e: unknown): TEntityMutationError => {
   }
 
   if (e instanceof EntityMutationError) {
-    logger.debug({ e }, 'analyzeMongoError - EntityMutationError');
-    return e.result;
-  }
-
-  if (e instanceof Error) {
-    logger.debug({ e }, 'analyzeMongoError - Error');
+    logger.debug(e, 'analyzeMongoError - EntityMutationError');
     return getCrudResultError(500, e.message || MONGODB_TITLE.unknownError);
   }
 
-  logger.debug({ e }, 'analyzeMongoError - unknownError');
+  if (e instanceof Error) {
+    logger.debug(e, 'analyzeMongoError - Error');
+    return getCrudResultError(500, e.message || MONGODB_TITLE.unknownError);
+  }
+
+  logger.debug(e, 'analyzeMongoError - unknownError');
   return getCrudResultError(500, MONGODB_TITLE.unknownError);
 };

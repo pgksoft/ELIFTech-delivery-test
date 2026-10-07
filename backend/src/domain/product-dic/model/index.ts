@@ -6,6 +6,8 @@ import { collectionNames } from '@db/const/collection-names';
 import { applyMutationDateTrigger } from '@db/triggers/mutation-date';
 import type { TApiProductCategory, TProductCategory } from '@domain/product-category-dic/model';
 import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
+import { isOneOfStringPredicate } from '@helpers/is-one-of-string-predicate';
+import definitionProductDeleteConstraints from '../constraints/delete';
 
 export type TProduct = {
   name: String;
@@ -15,10 +17,14 @@ export type TProduct = {
 
 export type TProductPopulated = Omit<TProduct, 'category'> & { category: TProductCategory };
 
-export type TApiProduct = Omit<TProductPopulated, 'category' | 'mutationDate'> & {
+export type TApiProduct = Omit<TProductPopulated, 'category' | 'mutationDate' | '__v'> & {
   category: TApiProductCategory;
   mutationDate: String;
 };
+
+export type TApiProductKey =
+  | keyof Omit<TApiProduct, 'category'>
+  | `category.${keyof TApiProductCategory}`;
 
 export type TProductDic = TProduct[];
 
@@ -54,14 +60,35 @@ export const productFieldsSchema: TFieldsSchema<TProductSchema> = {
   },
 };
 
-const productSchema = new Schema<TProductSchema>(productFieldsSchema);
+export const productSchema = new Schema<TProductSchema>(productFieldsSchema);
 applyMutationDateTrigger(productSchema, { field: 'mutationDate' });
+definitionProductDeleteConstraints();
 
 export const ProductModel = model<TProductSchema>(
   collectionNames.productDic,
   productSchema,
   collectionNames.productDic,
 );
+
+// View
+const productViewSchema = new Schema<TApiProduct>({}, { strict: false });
+export const ProductViewModel = model<TApiProduct>(
+  collectionNames.productDicView,
+  productViewSchema,
+  collectionNames.productDicView,
+);
+
+// Allow filter keys
+export type TFilterProductKey = Extract<TApiProductKey, 'name' | 'mutationDate' | 'category._id'>;
+export const allowFilterProductKeys: TFilterProductKey[] = [
+  'name',
+  'mutationDate',
+  'category._id',
+] as const;
+
+// Allow sort keys
+export type TSortProductKey = Extract<TApiProductKey, 'name' | 'category.name'>;
+export const allowSortProductKeys: TSortProductKey[] = ['name', 'category.name'] as const;
 
 // helpers
 export const isProductMutationDto: TypeGuard<TProductMutationDto> = (
@@ -77,3 +104,7 @@ export const isProductMutationDto: TypeGuard<TProductMutationDto> = (
     isStrictValidObjectId(value.category as string)
   );
 };
+
+export const isFilterProductKey = isOneOfStringPredicate(allowFilterProductKeys);
+
+export const isSortProductKey = isOneOfStringPredicate(allowSortProductKeys);
