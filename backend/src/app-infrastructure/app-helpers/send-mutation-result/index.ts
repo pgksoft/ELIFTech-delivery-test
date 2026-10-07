@@ -8,9 +8,6 @@ const sendMutationResult = <T>(result: TEntityMutationResult<T>, res: Response) 
     if (isEntityMutationSuccessBinary(result)) {
       const { headers, raw } = result;
       headers && Object.entries(headers).forEach(([k, v]) => res.set(k, v));
-      // if (Buffer.isBuffer(raw)) {
-      //   return res.status(code).send(raw);
-      // }
       return res.status(code).send(raw);
     } else {
       return res.status(code).json(result.data);

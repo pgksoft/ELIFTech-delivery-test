@@ -12,3 +12,5 @@ export const entityNameKeys = getArrayAsStringConst(
 );
 
 export type TEntityNameKeys = (typeof entityNameKeys)[number];
+
+export type TTEntityNameKeyViews = `${TEntityNameKeys}View`;

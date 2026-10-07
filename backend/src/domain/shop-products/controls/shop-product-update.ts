@@ -1,18 +1,14 @@
 import type { ClientSession } from 'mongoose';
 import {
   ShopProductModel,
-  type TApiShoppingCartProduct,
-  type TShoppingCartProductPopulated,
+  type TApiShopProduct,
   type TShopProductMutationDto,
+  type TShopProductPopulated,
   type TShopProductSchema,
 } from '../model';
 import type TEntityMutationResult from '@app-types/entity/t-entity-mutation-result';
 import { ensureProductExists, ensureShopExists } from '../guards';
 import { updatePopulateAndSerialize } from '@db/populate-&-serialize';
-import {
-  shoppingCartPopulateConfig,
-  shoppingCartSerializationRules,
-} from '../const/serialization&populate-config/shopping-cart';
 import {
   getCrudResultError,
   getCrudResultSuccessJson,
@@ -20,22 +16,23 @@ import {
 import { analyzeMongoError } from '@db/analyze-mongo-error';
 import { MULTER_REQUEST_KEY } from '@infra/multer';
 import type TUnknownRecord from '@app-types/t-unknown-record';
+import {
+  shopProductPopulateConfig,
+  shopProductSerializationRules,
+} from '../const/serialization&populate-config/selecting-products-by-shop';
 
 export const shopProductUpdate = async (
   id: string,
   shopProductMutationDto: TShopProductMutationDto | null,
   file: Express.Multer.File | null,
   session: ClientSession,
-): Promise<TEntityMutationResult<TApiShoppingCartProduct>> => {
+): Promise<TEntityMutationResult<TApiShopProduct>> => {
   try {
-    if (shopProductMutationDto) {
-      await ensureShopExists(shopProductMutationDto.shop, session);
-      await ensureProductExists(shopProductMutationDto.product, session);
-    }
-
     const patch: Partial<TShopProductSchema> = {};
 
     if (shopProductMutationDto) {
+      await ensureShopExists(shopProductMutationDto.shop, session);
+      await ensureProductExists(shopProductMutationDto.product, session);
       Object.assign(patch, shopProductMutationDto);
     }
 
@@ -50,16 +47,16 @@ export const shopProductUpdate = async (
     }
 
     const apiShopProduct = await updatePopulateAndSerialize<
-      TShoppingCartProductPopulated,
-      typeof shoppingCartSerializationRules,
-      TApiShoppingCartProduct,
+      TShopProductPopulated,
+      typeof shopProductSerializationRules,
+      TApiShopProduct,
       TShopProductSchema
     >(
       ShopProductModel,
       id,
       patch,
-      shoppingCartSerializationRules,
-      shoppingCartPopulateConfig,
+      shopProductSerializationRules,
+      shopProductPopulateConfig,
       session,
     );
     if (!apiShopProduct) return getCrudResultError(464);

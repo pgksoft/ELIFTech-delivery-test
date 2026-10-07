@@ -1,16 +1,17 @@
-import type { TEntityRecord } from '@app-types/entity/t-entity-data';
 import type { TEntityMongoDbMember } from '@app-types/entity/t-entity-mongodb-member';
 import type { TFieldsSchema } from '@app-types/t-fields-schema';
 import type TypeGuard from '@app-types/type-guard';
 import { collectionNames } from '@db/const/collection-names';
 import { applyMutationDateTrigger } from '@db/triggers/mutation-date';
+import { isOneOfStringPredicate } from '@helpers/is-one-of-string-predicate';
 import { model, Schema } from 'mongoose';
+import definitionShopDeleteConstraints from '../constraints/delete';
 
 export type TShop = { name: String; rating: number; mutationDate: Date } & TEntityMongoDbMember;
 
 export type TShopPopulated = TShop;
 
-export type TApiShop = Omit<TShopPopulated, 'mutationDate'> & { mutationDate: String };
+export type TApiShop = Omit<TShopPopulated, 'mutationDate' | '__v'> & { mutationDate: String };
 
 export type TShops = TShop[];
 
@@ -52,14 +53,23 @@ export const shopFieldsSchema: TFieldsSchema<TShopSchema> = {
   },
 };
 
-const shopSchema = new Schema<TShopSchema>(shopFieldsSchema);
+export const shopSchema = new Schema<TShopSchema>(shopFieldsSchema);
 applyMutationDateTrigger(shopSchema, { field: 'mutationDate' });
+definitionShopDeleteConstraints();
 
 export const ShopModel = model<TShopSchema>(
   collectionNames.shops,
   shopSchema,
   collectionNames.shops,
 );
+
+// Allow filter keys
+export type TFilterShopKey = keyof Pick<TApiShop, 'name' | 'rating' | 'mutationDate'>;
+export const allowFilterShopKeys: TFilterShopKey[] = ['name', 'rating', 'mutationDate'] as const;
+
+// Allow sort keys
+export type TSortShopKey = keyof Pick<TApiShop, 'name' | 'rating'>;
+export const allowSortShopKeys: TSortShopKey[] = ['name', 'rating'] as const;
 
 // helpers
 export const isShopMutationDto: TypeGuard<TShopMutationDto> = (
@@ -74,3 +84,7 @@ export const isShopMutationDto: TypeGuard<TShopMutationDto> = (
     typeof value.rating === 'number'
   );
 };
+
+export const isFilterShopKey = isOneOfStringPredicate(allowFilterShopKeys);
+
+export const isSortShopKey = isOneOfStringPredicate(allowSortShopKeys);

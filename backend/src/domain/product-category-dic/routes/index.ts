@@ -1,12 +1,18 @@
-import sendMutationResult from '@helpers/send-mutation-result';
 import { Router } from 'express';
 import { productCategoryList } from '../controls/product-category-list';
-import { isProductCategoryMutationDto } from '../model';
+import {
+  isFilterProductCategoryKey,
+  isProductCategoryMutationDto,
+  isSortProductCategoryKey,
+} from '../model';
 import { getCrudResultError } from '@helpers/send-mutation-result/crud-result';
 import { productCategoryCreate } from '../controls/product-category-create';
 import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
 import { MONGODB_TITLE } from '@db/const/mongodb_title';
+import sendMutationResult from '@helpers/send-mutation-result';
 import { productCategoryUpdate } from '../controls/product-category-update';
+import { productCategoryRemove } from '../controls/product-category-remove';
+import checkingAllowKeysEntityFilter from '@middleware/checking-allow-keys-entity-filter';
 
 const router = Router();
 
@@ -27,10 +33,14 @@ export default router;
  *             schema:
  *               $ref: '#/components/schemas/ProductCategoryList'
  */
-router.get('/', async (req, res) => {
-  const result = await productCategoryList({});
-  sendMutationResult(result, res);
-});
+router.get(
+  '/',
+  checkingAllowKeysEntityFilter(isFilterProductCategoryKey, isSortProductCategoryKey),
+  async (req, res) => {
+    const result = await productCategoryList(req.queryFilter, req.querySort);
+    sendMutationResult(result, res);
+  },
+);
 
 /**
  * @openapi
@@ -107,5 +117,35 @@ router.put('/:id', async (req, res) => {
     return sendMutationResult(getCrudResultError(400), res);
   }
   const result = await productCategoryUpdate(id, productCategoryMutationDto);
+  return sendMutationResult(result, res);
+});
+
+/**
+ * @openapi
+ * /api/product-category-dic/{id}:
+ *   delete:
+ *     tags: [ProductCategoryDic]
+ *     summary: Delete an existing product category name
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     security: []
+ *     responses:
+ *       204:
+ *         description: Existing product category successfully deleted
+ *       400:
+ *         description: Invalid ID
+ *       404:
+ *         description: Product category not found
+ */
+router.delete('/:id', async (req, res) => {
+  const id = req.params.id;
+  if (!isStrictValidObjectId(id)) {
+    return sendMutationResult(getCrudResultError(400, MONGODB_TITLE.invalidId), res);
+  }
+  const result = await productCategoryRemove(id);
   return sendMutationResult(result, res);
 });

@@ -1,9 +1,9 @@
 import type TEntityMutationResult from '@app-types/entity/t-entity-mutation-result';
 import {
   ShopProductModel,
-  type TApiShoppingCartProduct,
-  type TShoppingCartProductPopulated,
+  type TApiShopProduct,
   type TShopProductMutationDto,
+  type TShopProductPopulated,
   type TShopProductSchema,
 } from '../model';
 import type { ClientSession } from 'mongoose';
@@ -13,27 +13,27 @@ import {
   getCrudResultError,
   getCrudResultSuccessJson,
 } from '@helpers/send-mutation-result/crud-result';
-import {
-  shoppingCartPopulateConfig,
-  shoppingCartSerializationRules,
-} from '../const/serialization&populate-config/shopping-cart';
 import { MULTER_REQUEST_KEY } from '@infra/multer';
 import { ensureProductExists, ensureShopExists } from '../guards';
+import {
+  shopProductPopulateConfig,
+  shopProductSerializationRules,
+} from '../const/serialization&populate-config/selecting-products-by-shop';
 
 export const shopProductCreate = async (
   shopProductMutationDto: TShopProductMutationDto,
   file: Express.Multer.File,
   session: ClientSession,
-): Promise<TEntityMutationResult<TApiShoppingCartProduct>> => {
+): Promise<TEntityMutationResult<TApiShopProduct>> => {
   try {
     await ensureShopExists(shopProductMutationDto.shop, session);
     await ensureProductExists(shopProductMutationDto.product, session);
 
     const { originalname, mimetype, size, buffer } = file;
     const apiShopProduct = await createPopulateAndSerialize<
-      TShoppingCartProductPopulated,
-      typeof shoppingCartSerializationRules,
-      TApiShoppingCartProduct,
+      TShopProductPopulated,
+      typeof shopProductSerializationRules,
+      TApiShopProduct,
       TShopProductSchema
     >(
       ShopProductModel,
@@ -42,8 +42,8 @@ export const shopProductCreate = async (
         fileMeta: { originalname, mimetype, size },
         [MULTER_REQUEST_KEY]: buffer,
       },
-      shoppingCartSerializationRules,
-      shoppingCartPopulateConfig,
+      shopProductSerializationRules,
+      shopProductPopulateConfig,
       session,
     );
     if (!apiShopProduct) return getCrudResultError(464);

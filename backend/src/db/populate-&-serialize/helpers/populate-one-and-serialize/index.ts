@@ -12,7 +12,7 @@ export const populateOneAndSerialize = async <
   query: TMongooseQueryOne<TModelSchema>,
   rules: TRules,
 ): Promise<TApi | null> => {
-  const populated = await query.lean<TDbPopulated>().exec();
+  const populated = (await query.lean().exec()) as TDbPopulated | null;
 
   if (!populated) return null;
   return serializeEntity<TDbPopulated, TApi>(populated, rules);

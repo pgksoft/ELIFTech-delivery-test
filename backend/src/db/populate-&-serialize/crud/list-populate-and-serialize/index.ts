@@ -1,3 +1,4 @@
+import type TSortRecord from '@app-types/mongo-type/t-sort-record';
 import { getQueryFromPopulateConfig } from '@db/populate-&-serialize/helpers/get-query-from-populate-config';
 import { populateManyAndSerialize } from '@db/populate-&-serialize/helpers/populate-many-and-serialize';
 import type { TMongooseQueryMany, TPopulateNode } from '@db/populate-&-serialize/types';
@@ -12,11 +13,12 @@ export const listPopulateAndSerialize = async <
   TModelSchema extends TUnknownRecord, // schema type
 >(
   model: Model<TModelSchema>,
-  filter: TUnknownRecord,
+  rawFilter: TUnknownRecord,
+  rawSort: TSortRecord,
   rules: TRules,
   populateConfig?: TPopulateNode | TPopulateNode[],
 ): Promise<TApi[]> => {
-  let query = model.find(filter) as TMongooseQueryMany<TModelSchema>;
+  let query = model.find(rawFilter).sort(rawSort) as TMongooseQueryMany<TModelSchema>;
 
   if (populateConfig) {
     query = getQueryFromPopulateConfig<TModelSchema, TMongooseQueryMany<TModelSchema>>(

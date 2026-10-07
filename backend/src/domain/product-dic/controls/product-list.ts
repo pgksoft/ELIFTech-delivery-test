@@ -1,27 +1,26 @@
 import type TEntityMutationResult from '@app-types/entity/t-entity-mutation-result';
 import type TUnknownRecord from '@app-types/t-unknown-record';
-import type { TApiProduct, TApiProductDic, TProductPopulated, TProductSchema } from '../model';
-import { ProductModel } from '../model';
-import { listPopulateAndSerialize } from '@db/populate-&-serialize';
-import {
-  productPopulateConfig,
-  productSerializationRules,
-} from '../const/serialization&populate-config';
+import type { TApiProduct, TApiProductDic, TProductPopulated } from '../model';
+import { ProductViewModel } from '../model';
+import { productSerializationRules } from '../const/serialization&populate-config';
 import { getCrudResultSuccessJson } from '@helpers/send-mutation-result/crud-result';
 import { analyzeMongoError } from '@db/analyze-mongo-error';
+import { serializeEntity } from '@serialization/index';
+import type TSortRecord from '@app-types/mongo-type/t-sort-record';
 
 export const productList = async (
-  filter: TUnknownRecord,
+  rawFilter: TUnknownRecord,
+  rawSort: TSortRecord,
 ): Promise<TEntityMutationResult<TApiProductDic>> => {
   try {
-    // logger.debug({ filter }, 'productList');
-    const apiProductDic = await listPopulateAndSerialize<
-      TProductPopulated,
-      typeof productSerializationRules,
-      TApiProduct,
-      TProductSchema
-    >(ProductModel, filter, productSerializationRules, productPopulateConfig);
-    return getCrudResultSuccessJson(apiProductDic);
+    const [apiProductDic, total] = await Promise.all([
+      ProductViewModel.find(rawFilter).sort(rawSort).lean<TProductPopulated[]>(),
+      ProductViewModel.countDocuments(rawFilter),
+    ]);
+    const apiProductDicSerialize = apiProductDic.map((doc) =>
+      serializeEntity<TProductPopulated, TApiProduct>(doc, productSerializationRules),
+    );
+    return getCrudResultSuccessJson(apiProductDicSerialize);
   } catch (e) {
     return analyzeMongoError(e);
   }

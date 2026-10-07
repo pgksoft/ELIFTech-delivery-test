@@ -1,11 +1,11 @@
-import type { CamelToKebab } from '@app-types/camel-to-kebab';
+import type { TCamelToKebab } from '@app-types/camel-to-kebab';
 import type { TEntityNameKeys } from '@app-types/entity/t-entity-name-key';
 import type TValueOf from '@app-types/t-value-of';
 
 type TAppUrlKey = 'server' | 'openApiDocs' | 'uploads';
 
 type TAppPublicUrl = { [K in TAppUrlKey]: string } & {
-  [K in TEntityNameKeys]: `/api/${CamelToKebab<K>}`;
+  [K in TEntityNameKeys]: `/api/${TCamelToKebab<K>}`;
 };
 
 export const apiPublicUrl = {

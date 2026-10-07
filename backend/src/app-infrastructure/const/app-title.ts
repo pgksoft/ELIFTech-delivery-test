@@ -8,6 +8,8 @@ const APP_TITLE = {
   startupError: '❌ Startup error:',
   unknownError: 'unknown error',
   authError: 'Authorization error',
+  notAllowFilterKey: 'One or more filter keys are not allowed.',
+  notAllowSortKey: 'One or more sort keys are not allowed.',
   204: 'the entry was successfully deleted',
   400: 'Bad request',
   401: 'Item not found',

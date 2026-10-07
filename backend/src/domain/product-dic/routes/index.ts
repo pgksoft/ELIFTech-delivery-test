@@ -1,13 +1,15 @@
-import sendMutationResult from '@helpers/send-mutation-result';
 import { Router } from 'express';
 import { productList } from '../controls/product-list';
-import { isProductMutationDto } from '../model';
+import { isFilterProductKey, isProductMutationDto, isSortProductKey } from '../model';
 import { getCrudResultError } from '@helpers/send-mutation-result/crud-result';
 import { productCreate } from '../controls/product-create';
 import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
 import { MONGODB_TITLE } from '@db/const/mongodb_title';
+import sendMutationResult from '@helpers/send-mutation-result';
 import { productUpdate } from '../controls/product-update';
 import { withTransaction } from '@middleware/with-transaction';
+import checkingAllowKeysEntityFilter from '@middleware/checking-allow-keys-entity-filter';
+import { productRemove } from '../controls/product-remove';
 
 const router = Router();
 
@@ -28,10 +30,14 @@ export default router;
  *             schema:
  *               $ref: '#/components/schemas/ProductList'
  */
-router.get('/', async (req, res) => {
-  const result = await productList({ ...req.query });
-  sendMutationResult(result, res);
-});
+router.get(
+  '/',
+  checkingAllowKeysEntityFilter(isFilterProductKey, isSortProductKey),
+  async (req, res) => {
+    const result = await productList(req.queryFilter, req.querySort);
+    sendMutationResult(result, res);
+  },
+);
 
 /**
  * @openapi
@@ -116,3 +122,33 @@ router.put(
     return sendMutationResult(result, res);
   }),
 );
+
+/**
+ * @openapi
+ * /api/product-dic/{id}:
+ *   delete:
+ *     tags: [ProductDic]
+ *     summary: Delete an existing product name
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     security: []
+ *     responses:
+ *       204:
+ *         description: Existing product successfully deleted
+ *       400:
+ *         description: Invalid ID
+ *       404:
+ *         description: Product not found
+ */
+router.delete('/:id', async (req, res) => {
+  const id = req.params.id;
+  if (!isStrictValidObjectId(id)) {
+    return sendMutationResult(getCrudResultError(400, MONGODB_TITLE.invalidId), res);
+  }
+  const result = await productRemove(id);
+  return sendMutationResult(result, res);
+});
