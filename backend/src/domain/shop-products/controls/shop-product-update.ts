@@ -1,5 +1,6 @@
 import type { ClientSession } from 'mongoose';
 import {
+  isShopProductMutationDto,
   ShopProductModel,
   type TApiShopProduct,
   type TShopProductMutationDto,
@@ -30,7 +31,7 @@ export const shopProductUpdate = async (
   try {
     const patch: Partial<TShopProductSchema> = {};
 
-    if (shopProductMutationDto) {
+    if (isShopProductMutationDto(shopProductMutationDto)) {
       await ensureShopExists(shopProductMutationDto.shop, session);
       await ensureProductExists(shopProductMutationDto.product, session);
       Object.assign(patch, shopProductMutationDto);
