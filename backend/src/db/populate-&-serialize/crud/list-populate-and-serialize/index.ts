@@ -2,6 +2,7 @@ import type TSortRecord from '@app-types/mongo-type/t-sort-record';
 import { getQueryFromPopulateConfig } from '@db/populate-&-serialize/helpers/get-query-from-populate-config';
 import { populateManyAndSerialize } from '@db/populate-&-serialize/helpers/populate-many-and-serialize';
 import type { TMongooseQueryMany, TPopulateNode } from '@db/populate-&-serialize/types';
+import type { TPaginationValues } from '@helpers/get-pagination-values';
 import type TUnknownRecord from '@infra/app-type-helpers/t-unknown-record';
 import type { RulesFor } from '@serialization/dsl-types';
 import type { Model } from 'mongoose';
@@ -16,9 +17,14 @@ export const listPopulateAndSerialize = async <
   rawFilter: TUnknownRecord,
   rawSort: TSortRecord,
   rules: TRules,
+  paginationValues: TPaginationValues,
   populateConfig?: TPopulateNode | TPopulateNode[],
 ): Promise<TApi[]> => {
   let query = model.find(rawFilter).sort(rawSort) as TMongooseQueryMany<TModelSchema>;
+
+  if (paginationValues.enabled) {
+    query.skip(paginationValues.offset).limit(paginationValues.size);
+  }
 
   if (populateConfig) {
     query = getQueryFromPopulateConfig<TModelSchema, TMongooseQueryMany<TModelSchema>>(

@@ -12,28 +12,36 @@ import {
   productCategoryPopulateConfig,
   productCategorySerializationRules,
 } from '../const/serialization&populate-config';
-import { getCrudResultSuccessJson } from '@helpers/send-mutation-result/crud-result';
+import { getCrudResultSuccessList } from '@helpers/send-mutation-result/crud-result';
 import { analyzeMongoError } from '@db/analyze-mongo-error';
 import type TSortRecord from '@app-types/mongo-type/t-sort-record';
+import type { TPaginationParams } from '@app-types/mongo-type/t-pagination-params';
+import getPaginationValues from '@helpers/get-pagination-values';
 
 export const productCategoryList = async (
   rawFilter: TUnknownRecord,
   rawSort: TSortRecord,
+  rawPage: TPaginationParams,
 ): Promise<TEntityMutationResult<TApiProductCategoryDic>> => {
   try {
-    const apiProductCategoryDic = await listPopulateAndSerialize<
-      TProductCategoryPopulated,
-      typeof productCategorySerializationRules,
-      TApiProductCategory,
-      TProductCategorySchema
-    >(
-      ProductCategoryModel,
-      rawFilter,
-      rawSort,
-      productCategorySerializationRules,
-      productCategoryPopulateConfig,
-    );
-    return getCrudResultSuccessJson(apiProductCategoryDic);
+    const paginationValues = getPaginationValues(rawPage);
+    const [apiProductCategoryDic, total] = await Promise.all([
+      listPopulateAndSerialize<
+        TProductCategoryPopulated,
+        typeof productCategorySerializationRules,
+        TApiProductCategory,
+        TProductCategorySchema
+      >(
+        ProductCategoryModel,
+        rawFilter,
+        rawSort,
+        productCategorySerializationRules,
+        paginationValues,
+        productCategoryPopulateConfig,
+      ),
+      ProductCategoryModel.countDocuments(rawFilter),
+    ]);
+    return getCrudResultSuccessList(apiProductCategoryDic, total, paginationValues);
   } catch (e) {
     return analyzeMongoError(e);
   }

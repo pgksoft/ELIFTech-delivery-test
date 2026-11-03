@@ -38,7 +38,7 @@ router.get(
   '/',
   checkingAllowKeysEntityFilter(isFilterShopProductKey, isSortShopProductKey),
   async (req, res) => {
-    const result = await shopProductList(req.queryFilter, req.querySort);
+    const result = await shopProductList(req.queryFilter, req.querySort, req.page);
     sendMutationResult(result, res);
   },
 );
@@ -70,7 +70,7 @@ router.get('/:id/store', async (req, res) => {
   if (!isStrictValidObjectId(id)) {
     return sendMutationResult(getCrudResultError(400, MONGODB_TITLE.invalidId), res);
   }
-  const result = await shopProductList({ shop: id }, {});
+  const result = await shopProductList({ ...req.queryFilter, shop: id }, req.querySort, req.page);
   sendMutationResult(result, res);
 });
 

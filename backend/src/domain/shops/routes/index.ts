@@ -30,7 +30,7 @@ export default router;
  *               $ref: '#/components/schemas/ShopList'
  */
 router.get('/', checkingAllowKeysEntityFilter(isFilterShopKey, isSortShopKey), async (req, res) => {
-  const result = await shopList(req.queryFilter, req.querySort);
+  const result = await shopList(req.queryFilter, req.querySort, req.page);
   sendMutationResult(result, res);
 });
 
