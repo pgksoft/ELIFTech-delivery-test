@@ -34,7 +34,7 @@ router.get(
   '/',
   checkingAllowKeysEntityFilter(isFilterProductKey, isSortProductKey),
   async (req, res) => {
-    const result = await productList(req.queryFilter, req.querySort);
+    const result = await productList(req.queryFilter, req.querySort, req.page);
     sendMutationResult(result, res);
   },
 );

@@ -7,6 +7,7 @@ import normalizeToFilterMongo, { isShortFilterOperator } from '@helpers/normaliz
 import APP_TITLE from '@infra/const/app-title';
 import type TUnknownRecord from '@app-types/t-unknown-record';
 import normalizeToSortMongo from '@helpers/normalize-to-sort-mongo';
+import { isPaginationParams } from '@app-types/mongo-type/t-pagination-params';
 
 const checkingAllowKeysEntityFilter = <K extends string, S extends string>(
   isFilterEntityKey: TypeGuard<K>,
@@ -15,7 +16,9 @@ const checkingAllowKeysEntityFilter = <K extends string, S extends string>(
   return (req, res, next) => {
     const rawFilterQuery = (isPlainObject(req.query) && { ...req.query }) || {};
     const rawSortQuery = (isPlainObject(rawFilterQuery.sort) && rawFilterQuery.sort) || {};
+    const page = (isPaginationParams(rawFilterQuery.page) && rawFilterQuery.page) || { tk: 0 };
     delete rawFilterQuery.sort;
+    delete rawFilterQuery.page;
 
     // Filter keys
     const filterKeys = getCollectKeys(rawFilterQuery);
@@ -36,6 +39,7 @@ const checkingAllowKeysEntityFilter = <K extends string, S extends string>(
       return sendMutationResult(getCrudResultError(400, APP_TITLE.notAllowSortKey), res);
     }
     req.querySort = normalizeToSortMongo(rawSortQuery);
+    req.page = page;
 
     next();
   };

@@ -1,3 +1,4 @@
+import type { TPaginationParams } from '@app-types/mongo-type/t-pagination-params';
 import type TSortRecord from '@app-types/mongo-type/t-sort-record';
 import type TUnknownRecord from '@app-types/t-unknown-record';
 import type { Logger } from 'pino';
@@ -8,6 +9,7 @@ declare global {
       requestId?: string;
       queryFilter: TUnknownRecord;
       querySort: TSortRecord;
+      page: TPaginationParams;
     }
     interface Locals {
       logger?: Logger;

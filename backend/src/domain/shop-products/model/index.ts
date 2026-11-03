@@ -117,8 +117,8 @@ export const ShopProductModel = model<TShopProductSchema>(
 );
 
 // View
-const shopProductsViewSchema = new Schema<TApiProduct>({}, { strict: false });
-export const ShopProductsViewModel = model<TApiProduct>(
+const shopProductsViewSchema = new Schema<TApiShopProduct>({}, { strict: false });
+export const ShopProductsViewModel = model<TApiShopProduct>(
   collectionNames.shopProductsView,
   shopProductsViewSchema,
   collectionNames.shopProductsView,

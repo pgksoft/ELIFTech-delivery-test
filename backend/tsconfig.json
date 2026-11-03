@@ -37,6 +37,9 @@
       "@domain/*": [
         "./src/domain/*"
       ],
+      "@meta/*": [
+        "./src/meta-domain/*"
+      ],
       "@src/*": [
         "./src/*"
       ],

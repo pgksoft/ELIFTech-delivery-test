@@ -1,5 +1,21 @@
 import type TypeGuard from '@app-types/type-guard';
 
+export type TEntityView = {
+  page: number;
+  size: number;
+  first: number;
+  last: number;
+  next: number;
+  previous: number;
+};
+
+export type TEntityMutationSuccessList<T> = {
+  isSuccess: true;
+  code: number;
+  data: { items: T; total: number; entityView?: TEntityView };
+  responseType?: 'json';
+};
+
 export type TEntityMutationSuccessJson<T> = {
   isSuccess: true;
   code: number;
@@ -23,6 +39,7 @@ export type TEntityMutationError = {
 };
 
 type TEntityMutationResult<T> =
+  | TEntityMutationSuccessList<T>
   | TEntityMutationSuccessJson<T>
   | TEntityMutationSuccessBinary
   | TEntityMutationError;
