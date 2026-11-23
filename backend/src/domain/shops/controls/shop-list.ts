@@ -14,25 +14,16 @@ export const shopList = async (
   rawFilter: TUnknownRecord,
   rawSort: TSortRecord,
   rawPage: TPaginationParams,
+  total: number,
 ): Promise<TEntityMutationResult<TApiShops>> => {
   try {
     const paginationValues = getPaginationValues(rawPage);
-    const [apiShops, total] = await Promise.all([
-      listPopulateAndSerialize<
-        TShopPopulated,
-        typeof shopSerializationRules,
-        TApiShop,
-        TShopSchema
-      >(
-        ShopModel,
-        rawFilter,
-        rawSort,
-        shopSerializationRules,
-        paginationValues,
-        shopPopulateConfig,
-      ),
-      ShopModel.countDocuments(rawFilter),
-    ]);
+    const apiShops = await listPopulateAndSerialize<
+      TShopPopulated,
+      typeof shopSerializationRules,
+      TApiShop,
+      TShopSchema
+    >(ShopModel, rawFilter, rawSort, shopSerializationRules, paginationValues, shopPopulateConfig);
     return getCrudResultSuccessList(apiShops, total, paginationValues);
   } catch (e) {
     return analyzeMongoError(e);

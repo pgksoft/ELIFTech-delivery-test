@@ -22,25 +22,23 @@ export const productCategoryList = async (
   rawFilter: TUnknownRecord,
   rawSort: TSortRecord,
   rawPage: TPaginationParams,
+  total: number,
 ): Promise<TEntityMutationResult<TApiProductCategoryDic>> => {
   try {
     const paginationValues = getPaginationValues(rawPage);
-    const [apiProductCategoryDic, total] = await Promise.all([
-      listPopulateAndSerialize<
-        TProductCategoryPopulated,
-        typeof productCategorySerializationRules,
-        TApiProductCategory,
-        TProductCategorySchema
-      >(
-        ProductCategoryModel,
-        rawFilter,
-        rawSort,
-        productCategorySerializationRules,
-        paginationValues,
-        productCategoryPopulateConfig,
-      ),
-      ProductCategoryModel.countDocuments(rawFilter),
-    ]);
+    const apiProductCategoryDic = await listPopulateAndSerialize<
+      TProductCategoryPopulated,
+      typeof productCategorySerializationRules,
+      TApiProductCategory,
+      TProductCategorySchema
+    >(
+      ProductCategoryModel,
+      rawFilter,
+      rawSort,
+      productCategorySerializationRules,
+      paginationValues,
+      productCategoryPopulateConfig,
+    );
     return getCrudResultSuccessList(apiProductCategoryDic, total, paginationValues);
   } catch (e) {
     return analyzeMongoError(e);

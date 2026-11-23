@@ -39,6 +39,8 @@ const checkingAllowKeysEntityFilter = <K extends string, S extends string>(
       return sendMutationResult(getCrudResultError(400, APP_TITLE.notAllowSortKey), res);
     }
     req.querySort = normalizeToSortMongo(rawSortQuery);
+
+    // Pagination
     req.page = page;
 
     next();

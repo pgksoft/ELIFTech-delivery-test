@@ -3,6 +3,7 @@ import { shopProductFieldsSchema } from '@domain/shop-products/model';
 import { getOpenApiSchema } from '@helpers/get-open-api-schema';
 import { MULTER_REQUEST_KEY } from '@infra/multer';
 import type { OpenAPIV3 } from 'openapi-types';
+import { getPaginatedListSchema } from '../entity-view';
 
 export const openApiShopProductSchemas: Record<
   string,
@@ -55,9 +56,6 @@ export const openApiShopProductSchemas: Record<
       { $ref: '#/components/schemas/ShopProductUploadImageDto' },
     ],
   },
-  ShopProductList: {
-    type: 'array',
-    items: { $ref: '#/components/schemas/ShopProduct' },
-  },
-  ShoppingCartList: { type: 'array', items: { $ref: '#/components/schemas/ShoppingCart' } },
+  ShopProductList: getPaginatedListSchema('#/components/schemas/ShopProduct'),
+  ShoppingCartList: getPaginatedListSchema('#/components/schemas/ShoppingCart'),
 };

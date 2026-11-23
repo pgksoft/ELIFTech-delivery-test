@@ -8,6 +8,11 @@ import type { TApiProductCategory, TProductCategory } from '@domain/product-cate
 import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
 import { isOneOfStringPredicate } from '@helpers/is-one-of-string-predicate';
 import definitionProductDeleteConstraints from '../constraints/delete';
+import getOpenApiEntitySortParameters from '@helpers/get-open-api-entity-sort-parameters';
+import {
+  getOpenApiEntityFindParams,
+  type TFindFieldConfig,
+} from '@helpers/get-open-api-entity-find-params';
 
 export type TProduct = {
   name: String;
@@ -86,9 +91,31 @@ export const allowFilterProductKeys: TFilterProductKey[] = [
   'category._id',
 ] as const;
 
+const productFindFieldConfig: TFindFieldConfig<TFilterProductKey>[] = [
+  {
+    key: 'name',
+    format: 'text-context',
+  },
+  {
+    key: 'category._id',
+    format: 'list-checkbox',
+  },
+  { key: 'mutationDate', format: 'date-range' },
+] as const;
+
+export const productOpenApiFindParams = getOpenApiEntityFindParams(
+  'productDic',
+  productFindFieldConfig,
+);
+
 // Allow sort keys
 export type TSortProductKey = Extract<TApiProductKey, 'name' | 'category.name'>;
 export const allowSortProductKeys: TSortProductKey[] = ['name', 'category.name'] as const;
+
+export const productOpenApiSortParam = getOpenApiEntitySortParameters(
+  'productDic',
+  allowSortProductKeys,
+);
 
 // helpers
 export const isProductMutationDto: TypeGuard<TProductMutationDto> = (

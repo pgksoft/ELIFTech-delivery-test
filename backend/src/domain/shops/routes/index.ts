@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { shopList } from '../controls/shop-list';
 import sendMutationResult from '@helpers/send-mutation-result';
-import { isFilterShopKey, isShopMutationDto, isSortShopKey } from '../model';
+import { isFilterShopKey, isShopMutationDto, isSortShopKey, ShopModel } from '../model';
 import { getCrudResultError } from '@helpers/send-mutation-result/crud-result';
 import { shopCreate } from '../controls/shop-create';
 import { MONGODB_TITLE } from '@db/const/mongodb_title';
@@ -9,6 +9,7 @@ import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
 import { shopUpdate } from '../controls/shop-update';
 import checkingAllowKeysEntityFilter from '@middleware/checking-allow-keys-entity-filter';
 import { shopRemove } from '../controls/shop-remove';
+import checkingPage from '@middleware/checking-page';
 
 const router = Router();
 
@@ -21,6 +22,16 @@ export default router;
  *     tags: [Shops]
  *     summary: Get shop list
  *     security: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/PageTake'
+ *       - $ref: '#/components/parameters/PageSize'
+ *       - $ref: '#/components/parameters/shopsNameSortParam'
+ *       - $ref: '#/components/parameters/shopsRatingSortParam'
+ *       - $ref: '#/components/parameters/shopsNameFindParam'
+ *       - $ref: '#/components/parameters/shopsMutationDateGteFindParam'
+ *       - $ref: '#/components/parameters/shopsMutationDateLteFindParam'
+ *       - $ref: '#/components/parameters/shopsRatingGteFindParam'
+ *       - $ref: '#/components/parameters/shopsRatingLteFindParam'
  *     responses:
  *       200:
  *         description: Shop list
@@ -29,10 +40,15 @@ export default router;
  *             schema:
  *               $ref: '#/components/schemas/ShopList'
  */
-router.get('/', checkingAllowKeysEntityFilter(isFilterShopKey, isSortShopKey), async (req, res) => {
-  const result = await shopList(req.queryFilter, req.querySort, req.page);
-  sendMutationResult(result, res);
-});
+router.get(
+  '/',
+  checkingAllowKeysEntityFilter(isFilterShopKey, isSortShopKey),
+  checkingPage({ model: ShopModel }),
+  async (req, res) => {
+    const result = await shopList(req.queryFilter, req.querySort, req.page, req.total);
+    sendMutationResult(result, res);
+  },
+);
 
 /**
  * @openapi

@@ -10,6 +10,7 @@ declare global {
       queryFilter: TUnknownRecord;
       querySort: TSortRecord;
       page: TPaginationParams;
+      total: number;
     }
     interface Locals {
       logger?: Logger;

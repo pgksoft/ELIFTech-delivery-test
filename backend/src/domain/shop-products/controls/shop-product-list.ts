@@ -19,14 +19,12 @@ export const shopProductList = async (
   rawFilter: TUnknownRecord,
   rawSort: TSortRecord,
   rawPage: TPaginationParams,
+  total: number,
 ): Promise<TEntityMutationResult<TApiShopProducts>> => {
   try {
     const paginationValues = getPaginationValues(rawPage);
     const listQuery = createListQuery(ShopProductsViewModel, rawFilter, rawSort, paginationValues);
-    const [apiShopProducts, total] = await Promise.all([
-      listQuery.lean<TShopProductPopulated[]>(),
-      ShopProductsViewModel.countDocuments(rawFilter),
-    ]);
+    const apiShopProducts = await listQuery.lean<TShopProductPopulated[]>();
     const apiShopProductsSerialize = apiShopProducts.map((doc) =>
       serializeEntity<TShopProductPopulated, TApiShopProduct>(doc, shopProductSerializationRules),
     );

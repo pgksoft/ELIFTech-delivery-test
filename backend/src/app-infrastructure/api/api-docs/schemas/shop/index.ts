@@ -2,6 +2,7 @@ import { openApiSchemaEntityMember } from '@db/open-api-schema-entity-member';
 import { shopFieldsSchema } from '@domain/shops/model';
 import { getOpenApiSchema } from '@helpers/get-open-api-schema';
 import type { OpenAPIV3 } from 'openapi-types';
+import { getPaginatedListSchema } from '../entity-view';
 
 export const openApiShopSchemas: Record<
   string,
@@ -12,8 +13,5 @@ export const openApiShopSchemas: Record<
     mode: 'exclude',
     keys: ['mutationDate'],
   }),
-  ShopList: {
-    type: 'array',
-    items: { $ref: '#/components/schemas/Shop' },
-  },
+  ShopList: getPaginatedListSchema('#/components/schemas/Shop'),
 };

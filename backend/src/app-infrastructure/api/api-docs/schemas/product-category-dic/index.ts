@@ -2,6 +2,7 @@ import { openApiSchemaEntityMember } from '@db/open-api-schema-entity-member';
 import { productCategoryFieldsSchema } from '@domain/product-category-dic/model';
 import { getOpenApiSchema } from '@helpers/get-open-api-schema';
 import type { OpenAPIV3 } from 'openapi-types';
+import { getPaginatedListSchema } from '../entity-view';
 
 export const openApiProductCategorySchemas: Record<
   string,
@@ -16,8 +17,5 @@ export const openApiProductCategorySchemas: Record<
     mode: 'exclude',
     keys: ['mutationDate'],
   }),
-  ProductCategoryList: {
-    type: 'array',
-    items: { $ref: '#/components/schemas/ProductCategory' },
-  },
+  ProductCategoryList: getPaginatedListSchema('#/components/schemas/ProductCategory'),
 };

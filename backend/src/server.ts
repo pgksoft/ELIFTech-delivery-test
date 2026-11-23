@@ -10,6 +10,7 @@ setupProcessHandlers();
 
 const main = async () => {
   await connectToMongo();
+
   const app = createApp();
   app.listen(config.port, () => {
     logger.info(`${APP_TITLE.launchServer} ${APP_TITLE.localUrl}:${config.port}`);
