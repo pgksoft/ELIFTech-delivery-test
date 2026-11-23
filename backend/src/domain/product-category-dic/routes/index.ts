@@ -4,6 +4,7 @@ import {
   isFilterProductCategoryKey,
   isProductCategoryMutationDto,
   isSortProductCategoryKey,
+  ProductCategoryModel,
 } from '../model';
 import { getCrudResultError } from '@helpers/send-mutation-result/crud-result';
 import { productCategoryCreate } from '../controls/product-category-create';
@@ -13,6 +14,7 @@ import sendMutationResult from '@helpers/send-mutation-result';
 import { productCategoryUpdate } from '../controls/product-category-update';
 import { productCategoryRemove } from '../controls/product-category-remove';
 import checkingAllowKeysEntityFilter from '@middleware/checking-allow-keys-entity-filter';
+import checkingPage from '@middleware/checking-page';
 
 const router = Router();
 
@@ -25,6 +27,13 @@ export default router;
  *     tags: [ProductCategoryDic]
  *     summary: Get product category dictionary
  *     security: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/PageTake'
+ *       - $ref: '#/components/parameters/PageSize'
+ *       - $ref: '#/components/parameters/productCategoryDicNameSortParam'
+ *       - $ref: '#/components/parameters/productCategoryDicNameFindParam'
+ *       - $ref: '#/components/parameters/productCategoryDicMutationDateGteFindParam'
+ *       - $ref: '#/components/parameters/productCategoryDicMutationDateLteFindParam'
  *     responses:
  *       200:
  *         description: Product category dictionary
@@ -36,8 +45,9 @@ export default router;
 router.get(
   '/',
   checkingAllowKeysEntityFilter(isFilterProductCategoryKey, isSortProductCategoryKey),
+  checkingPage({ model: ProductCategoryModel }),
   async (req, res) => {
-    const result = await productCategoryList(req.queryFilter, req.querySort, req.page);
+    const result = await productCategoryList(req.queryFilter, req.querySort, req.page, req.total);
     sendMutationResult(result, res);
   },
 );

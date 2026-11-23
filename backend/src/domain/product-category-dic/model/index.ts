@@ -7,6 +7,11 @@ import { applyMutationDateTrigger } from '@db/triggers/mutation-date';
 import { model, Schema } from 'mongoose';
 import definitionProductCategoryDeleteConstraints from '../constraints/delete';
 import { isOneOfStringPredicate } from '@helpers/is-one-of-string-predicate';
+import getOpenApiEntitySortParameters from '@helpers/get-open-api-entity-sort-parameters';
+import {
+  getOpenApiEntityFindParams,
+  type TFindFieldConfig,
+} from '@helpers/get-open-api-entity-find-params';
 
 export type TProductCategory = { name: String; mutationDate: Date } & TEntityMongoDbMember;
 
@@ -64,9 +69,27 @@ export const allowFilterProductCategoryKeys: TFilterProductCategoryKey[] = [
   'mutationDate',
 ] as const;
 
+const productCategoryFindFieldConfig: TFindFieldConfig<TFilterProductCategoryKey>[] = [
+  {
+    key: 'name',
+    format: 'text-context',
+  },
+  { key: 'mutationDate', format: 'date-range' },
+] as const;
+
+export const productCategoryOpenApiFindParams = getOpenApiEntityFindParams(
+  'productCategoryDic',
+  productCategoryFindFieldConfig,
+);
+
 // Allow sort keys
 export type TSortProductCategoryKey = keyof Pick<TApiProductCategory, 'name'>;
 export const allowSortProductCategoryKeys: TSortProductCategoryKey[] = ['name'] as const;
+
+export const productCategoryOpenApiSortParam = getOpenApiEntitySortParameters(
+  'productCategoryDic',
+  allowSortProductCategoryKeys,
+);
 
 // helpers
 export const isProductCategoryMutationDto: TypeGuard<TProductCategoryMutationDto> = (

@@ -10,6 +10,12 @@ import { applyMutationDateTrigger } from '@db/triggers/mutation-date';
 import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
 import { isOnlyDigits } from '@helpers/is-only-digits';
 import { isOneOfStringPredicate } from '@helpers/is-one-of-string-predicate';
+import getOpenApiEntitySortParameters from '@helpers/get-open-api-entity-sort-parameters';
+import {
+  getOpenApiEntityFindParams,
+  type TFindFieldConfig,
+} from '@helpers/get-open-api-entity-find-params';
+import { fixedRangesRatingSearch } from '@domain/product-dic/const/rating-determination-on-fixed-ranges';
 
 export type TFileMeta = Pick<Express.Multer.File, 'originalname' | 'mimetype' | 'size'>;
 
@@ -137,6 +143,32 @@ export const allowFilterShopProductKeys: TFilterShopProductsKey[] = [
   'mutationDate',
 ] as const;
 
+const shopProductsFindFieldConfig: TFindFieldConfig<TFilterShopProductsKey>[] = [
+  {
+    key: 'shop._id',
+    format: 'list-checkbox',
+  },
+  {
+    key: 'shop.rating',
+    format: 'fixed-num-range',
+    fixedRanges: fixedRangesRatingSearch,
+  },
+  {
+    key: 'product.name',
+    format: 'text-context',
+  },
+  {
+    key: 'product.category._id',
+    format: 'list-checkbox',
+  },
+  { key: 'mutationDate', format: 'date-range' },
+] as const;
+
+export const shopProductsOpenApiFindParams = getOpenApiEntityFindParams(
+  'shopProducts',
+  shopProductsFindFieldConfig,
+);
+
 // Allow sort keys
 export type TSortShopProductsKey = Extract<
   TApiShopProductKey,
@@ -149,6 +181,11 @@ export const allowSortShopProductKeys: TSortShopProductsKey[] = [
   'product.category.name',
   'price',
 ] as const;
+
+export const shopProductsOpenApiSortParam = getOpenApiEntitySortParameters(
+  'shopProducts',
+  allowSortShopProductKeys,
+);
 
 // helpers
 export const isShopProductMutationDto: TypeGuard<TShopProductMutationDto> = (

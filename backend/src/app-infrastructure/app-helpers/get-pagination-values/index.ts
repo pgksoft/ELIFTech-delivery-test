@@ -6,9 +6,9 @@ export type TPaginationValues =
   | { enabled: true; page: number; offset: number; size: number };
 
 const getPaginationValues = (paginationParams: TPaginationParams): TPaginationValues => {
-  if (paginationParams.tk <= 0) return { enabled: false };
   const size = Number(paginationParams.sz) || PAGE_SIZE;
   const page = Number(paginationParams.tk);
+  if (page <= 0) return { enabled: false };
   return { enabled: true, page, offset: (page - 1) * size, size };
 };
 

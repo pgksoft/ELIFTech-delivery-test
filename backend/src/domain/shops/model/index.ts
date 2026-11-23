@@ -6,6 +6,12 @@ import { applyMutationDateTrigger } from '@db/triggers/mutation-date';
 import { isOneOfStringPredicate } from '@helpers/is-one-of-string-predicate';
 import { model, Schema } from 'mongoose';
 import definitionShopDeleteConstraints from '../constraints/delete';
+import getOpenApiEntitySortParameters from '@helpers/get-open-api-entity-sort-parameters';
+import {
+  getOpenApiEntityFindParams,
+  type TFindFieldConfig,
+} from '@helpers/get-open-api-entity-find-params';
+import { fixedRangesRatingSearch } from '@domain/product-dic/const/rating-determination-on-fixed-ranges';
 
 export type TShop = { name: String; rating: number; mutationDate: Date } & TEntityMongoDbMember;
 
@@ -26,7 +32,7 @@ export const shopFieldsSchema: TFieldsSchema<TShopSchema> = {
     type: String,
     required: true,
     unique: true,
-    minLength: 5,
+    minLength: 3,
     maxLength: 160,
     openApi: { description: 'Shop name' },
   },
@@ -67,9 +73,26 @@ export const ShopModel = model<TShopSchema>(
 export type TFilterShopKey = keyof Pick<TApiShop, 'name' | 'rating' | 'mutationDate'>;
 export const allowFilterShopKeys: TFilterShopKey[] = ['name', 'rating', 'mutationDate'] as const;
 
+const shopFindFieldConfig: TFindFieldConfig<TFilterShopKey>[] = [
+  {
+    key: 'name',
+    format: 'text-context',
+  },
+  {
+    key: 'rating',
+    format: 'fixed-num-range',
+    fixedRanges: fixedRangesRatingSearch,
+  },
+  { key: 'mutationDate', format: 'date-range' },
+] as const;
+
+export const shopOpenApiFindParams = getOpenApiEntityFindParams('shops', shopFindFieldConfig);
+
 // Allow sort keys
 export type TSortShopKey = keyof Pick<TApiShop, 'name' | 'rating'>;
 export const allowSortShopKeys: TSortShopKey[] = ['name', 'rating'] as const;
+
+export const shopOpenApiSortParam = getOpenApiEntitySortParameters('shops', allowSortShopKeys);
 
 // helpers
 export const isShopMutationDto: TypeGuard<TShopMutationDto> = (

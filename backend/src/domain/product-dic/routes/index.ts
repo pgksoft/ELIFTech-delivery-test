@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { productList } from '../controls/product-list';
-import { isFilterProductKey, isProductMutationDto, isSortProductKey } from '../model';
+import {
+  isFilterProductKey,
+  isProductMutationDto,
+  isSortProductKey,
+  ProductViewModel,
+} from '../model';
 import { getCrudResultError } from '@helpers/send-mutation-result/crud-result';
 import { productCreate } from '../controls/product-create';
 import { isStrictValidObjectId } from '@db/is-strict-valid-object-id';
@@ -10,6 +15,7 @@ import { productUpdate } from '../controls/product-update';
 import { withTransaction } from '@middleware/with-transaction';
 import checkingAllowKeysEntityFilter from '@middleware/checking-allow-keys-entity-filter';
 import { productRemove } from '../controls/product-remove';
+import checkingPage from '@middleware/checking-page';
 
 const router = Router();
 
@@ -22,6 +28,15 @@ export default router;
  *     tags: [ProductDic]
  *     summary: Get product dictionary
  *     security: []
+ *     parameters:
+ *       - $ref: '#/components/parameters/PageTake'
+ *       - $ref: '#/components/parameters/PageSize'
+ *       - $ref: '#/components/parameters/productDicNameSortParam'
+ *       - $ref: '#/components/parameters/productDicCategoryNameSortParam'
+ *       - $ref: '#/components/parameters/productDicNameFindParam'
+ *       - $ref: '#/components/parameters/productDicMutationDateGteFindParam'
+ *       - $ref: '#/components/parameters/productDicMutationDateLteFindParam'
+ *       - $ref: '#/components/parameters/productDicCategory_idFindParam'
  *     responses:
  *       200:
  *         description: Product dictionary
@@ -33,8 +48,9 @@ export default router;
 router.get(
   '/',
   checkingAllowKeysEntityFilter(isFilterProductKey, isSortProductKey),
+  checkingPage({ model: ProductViewModel }),
   async (req, res) => {
-    const result = await productList(req.queryFilter, req.querySort, req.page);
+    const result = await productList(req.queryFilter, req.querySort, req.page, req.total);
     sendMutationResult(result, res);
   },
 );
